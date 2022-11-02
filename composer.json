@@ -1,0 +1,21 @@
+{
+  "name": "wrdickson/apitest",
+  "description": "My first packagist package, api focus",
+  "require": {
+      "php": ">=5.3.0"
+  },
+  "license": "mit",
+  "authors": [
+      {
+          "name": "William R Dickson",
+          "email": "webmaster@trekbill.com",
+          "homepage": "http://trekbill.com"
+      }
+  ],
+  "minimum-stability": "dev",
+  "autoload": {
+      "psr-4": {
+          "wrdickson\\api-composer-test\\": "src/"
+      }
+  }
+}
