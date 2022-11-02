@@ -12,7 +12,6 @@
           "homepage": "http://trekbill.com"
       }
   ],
-  "minimum-stability": "stable",
   "autoload": {
       "psr-4": {
           "wrdickson\\apitest\\": "src/"
