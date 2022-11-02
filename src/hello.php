@@ -1,6 +1,6 @@
 <?php
 
-namespace wrdickson;
+namespace wrdickson\apitest;
 
 Class Hello {
 
