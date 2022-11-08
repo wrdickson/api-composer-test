@@ -179,6 +179,21 @@ Class Auth {
     }
   }
 
+  public function set_password($user_id, $password) {
+    if($user_id){
+      $xid = $user_id;
+      $password_hash = password_hash($password, PASSWORD_DEFAULT);
+      $pdo = $this->get_connection();
+      $stmt = $pdo->prepare("UPDATE accounts SET password = :newP WHERE id = :xid");
+      $stmt->bindParam(":newP", $password_hash, PDO::PARAM_STR);
+      $stmt->bindParam(":xid", $xid, PDO::PARAM_INT);
+      $result = $stmt->execute();
+      return $result;
+    } else {
+      return -1;
+    }
+  }
+
   private function update_activity(){
     $pdo = $this->get_connection();
     $stmt = $pdo->prepare("UPDATE accounts SET last_activity = NOW() WHERE id = :i");
