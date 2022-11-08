@@ -2,7 +2,8 @@
   "name": "wrdickson/apitest",
   "description": "My first packagist package, api focus",
   "require": {
-      "php": ">=5.3.0"
+      "php": ">=5.3.0",
+      "firebase/php-jwt": "^6.3"
   },
   "license": "MIT",
   "authors": [
