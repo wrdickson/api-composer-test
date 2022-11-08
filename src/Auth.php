@@ -1,6 +1,14 @@
 <?php
 
-namespace wridickson\apitest;
+namespace wrdickson\apitest;
+
+use \PDO;
+use \DateTimeImmutable;
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+use \Firebase\JWT\SignatureInvalidException;
+use \Firebase\JWT\BeforeValidException;
+use \Firebase\JWT\ExpiredException;
 
 Class Auth {
 
@@ -127,9 +135,9 @@ Class Auth {
 }
 
   public function load_account ( $account_id ) {
-    $pdo = $this->data_connector->get_connection( );
+    $pdo = $this->get_connection( );
     $stmt = $pdo->prepare("SELECT * FROM accounts WHERE id = :id");
-    $stmt->bindParam(":id", $id);
+    $stmt->bindParam(":id", $account_id);
     $stmt->execute();
     while($obj = $stmt->fetch(PDO::FETCH_OBJ)){
       $this->id = $obj->id;
