@@ -2,8 +2,6 @@
 
 namespace wrdickson\apitest;
 
-require '../vendor/autoload.php';
-
 Class Hello {
 
   private $name;
