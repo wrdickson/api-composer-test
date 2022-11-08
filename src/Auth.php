@@ -30,8 +30,6 @@ Class Auth {
     $this->db_user = $db_user;
     $this->db_pass = $db_pass;
 
-    $this->data_connector = new DataConnector();
-
   }
 
   public function account_to_array_secure () {
@@ -115,8 +113,21 @@ Class Auth {
     return $token;
   }
 
+  public function get_connection( ){
+    try {
+       $pdo = new PDO('mysql:host=' . $this->db_host .';dbname=' . $this->db_name, $this->db_user, $this->db_pass);
+       //  see https://stackoverflow.com/questions/60174/how-can-i-prevent-sql-injection-in-php?rq=1
+       $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+       $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $pdo;
+    } catch (PDOException $e) {
+        return "Error!: " . $e->getMessage() . "<br/>";
+        die();
+    }   
+}
+
   public function load_account ( $account_id ) {
-    $pdo = $this->data_connector->get_connection( $this->db_host, $this->dc_name, $this->db_user, $this->db_pass );
+    $pdo = $this->data_connector->get_connection( );
     $stmt = $pdo->prepare("SELECT * FROM accounts WHERE id = :id");
     $stmt->bindParam(":id", $id);
     $stmt->execute();
