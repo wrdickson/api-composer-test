@@ -71,7 +71,7 @@ Class Auth {
         } else {
           //  test iss, nbf and exp
           $now = new DateTimeImmutable();
-          if ($authenticate_decoded->iss !== SERVER_NAME ||
+          if ($authenticate_decoded->iss !== $this->server_name ||
               $authenticate_decoded->nbf > $now->getTimestamp() ||
               $authenticate_decoded->exp < $now->getTimestamp()) {
             //  status 401: Unauthorized
