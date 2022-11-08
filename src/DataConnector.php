@@ -7,7 +7,7 @@ use \PDO;
 /*
 class.data_connecter.php
 */
-class Data_Connector {
+class DataConnector {
     public static function get_connection( $db_host, $db_name, $db_user, $db_pass){
         try {
            $pdo = new PDO('mysql:host=' . $db_host .';dbname=' . $db_name, $db_user, $db_pass);
