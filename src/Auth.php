@@ -112,20 +112,19 @@ Class Auth {
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     if(is_array($result)) {
       if(password_verify($password, $result['password']) == true){
-        $response['pass'] = true;
+        $response['pass'] = 1;
         $response['account_id'] = $result['id'];
         $account = $this->load_account($result['id']);
-        //  update the login
-        //$response['update_login'] = $account->update_login();
-        //$response['update_activity'] = $account->update_activity();
         $response['account'] = $this->account_to_array_secure();
         $response['token'] = $this->generate_token($result['id']);
+        $response['update_activity'] = $this->update_activity();
+        $response['update_last_login'] = $this->update_login();
       } else {
-        $response['pass'] = false;
+        $response['pass'] = 0;
         $response['account_id'] = -1;
       }
     } else {
-      $response['pass'] = false;
+      $response['pass'] = 0;
       $response['account_id'] = -1;
     }
     return $response;
@@ -178,5 +177,21 @@ Class Auth {
       $this->last_activity = $obj->last_activity;
       $this->is_active = (int)$obj->is_active;
     }
+  }
+
+  private function update_activity(){
+    $pdo = $this->get_connection();
+    $stmt = $pdo->prepare("UPDATE accounts SET last_activity = NOW() WHERE id = :i");
+    $stmt->bindParam(":i", $this->id,PDO::PARAM_STR);
+    $result = $stmt->execute();
+    return $result;
+  }
+
+  private function update_login(){
+    $pdo = $this->get_connection();
+    $stmt = $pdo->prepare("UPDATE accounts SET last_login = NOW() WHERE id = :i");
+    $stmt->bindParam(":i", $this->id,PDO::PARAM_STR);
+    $result = $stmt->execute();
+    return $result;
   }
 }
