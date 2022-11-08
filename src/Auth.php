@@ -103,6 +103,33 @@ Class Auth {
     return $r;
   }
 
+  public function check_login( $username, $password ) {
+    $response = array();
+    $pdo = $this->get_connection();
+    $stmt = $pdo->prepare('SELECT * FROM accounts WHERE username = :u');
+    $stmt->bindParam(':u', $username);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if(is_array($result)) {
+      if(password_verify($password, $result['password']) == true){
+        $response['pass'] = true;
+        $response['account_id'] = $result['id'];
+        $account = new Account($result['id']);
+        //  update the login
+        $response['update_login'] = $account->update_login();
+        $response['update_activity'] = $account->update_activity();
+        $response['account'] = $account->to_array_secure();
+      } else {
+        $response['pass'] = false;
+        $response['account_id'] = -1;
+      }
+    } else {
+      $response['pass'] = false;
+      $response['account_id'] = -1;
+    }
+    return $response;
+  }
+
   public function generate_token( $account_id ) {
     $this->load_account( $account_id );
     $issuedAt = new DateTimeImmutable();
