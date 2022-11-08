@@ -115,7 +115,7 @@ Class Auth {
       'exp_f' => date("Y-m-d H:m:s", $expire),  // Formatted expire
       'nbf'  => $issuedAt->getTimestamp(),  // Not before
       'nbf_f' => date( "Y-m-d H:m:s", $issuedAt->getTimestamp() ),  // Formatted not before
-      'account' => $this->account->to_array_secure()
+      'account' => $this->account_to_array_secure()
     ];
     $token = JWT::encode($payload, $this->jwt_key, 'HS256');
     return $token;
@@ -151,7 +151,4 @@ Class Auth {
       $this->is_active = (int)$obj->is_active;
     }
   }
-
-
-
 }
