@@ -119,6 +119,7 @@ Class Auth {
         //$response['update_login'] = $account->update_login();
         //$response['update_activity'] = $account->update_activity();
         $response['account'] = $this->account_to_array_secure();
+        $response['token'] = $this->generate_token($result['id']);
       } else {
         $response['pass'] = false;
         $response['account_id'] = -1;
