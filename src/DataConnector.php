@@ -8,7 +8,12 @@ use \PDO;
 class.data_connecter.php
 */
 class DataConnector {
-    public static function get_connection( $db_host, $db_name, $db_user, $db_pass){
+
+    public function __construct () {
+
+    }
+
+    public function get_connection( $db_host, $db_name, $db_user, $db_pass){
         try {
            $pdo = new PDO('mysql:host=' . $db_host .';dbname=' . $db_name, $db_user, $db_pass);
            //  see https://stackoverflow.com/questions/60174/how-can-i-prevent-sql-injection-in-php?rq=1

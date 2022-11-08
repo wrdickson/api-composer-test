@@ -17,35 +17,21 @@ class Account {
     private $is_active;
 
     public function __construct($id){
-        //handle the case of a non user
-        if($id == 0){
-        $this->id = 0;
-        $this->username = "Guest";
-        $this->email = "";
-        $this->permission = 1;
-        $this->roles = array();
-        $this->registered = 0;
-        $this->last_login = 0;
-        $this->last_activity = 0;
-        $this->is_active = 0;
-        } else {
-          //get properties from db
-          $pdo = DataConnector::get_connection();
-          $stmt = $pdo->prepare("SELECT * FROM accounts WHERE id = :id");
-          $stmt->bindParam(":id",$id,PDO::PARAM_INT);
-          $stmt->execute();
-          while($obj = $stmt->fetch(PDO::FETCH_OBJ)){
-            $this->id = $obj->id;
-            $this->username = $obj->username;
-            $this->email = $obj->email;
-            $this->permission = $obj->permission;
-            $this->roles = json_decode($obj->roles, true);
-            $this->registered = $obj->registered;
-            $this->last_login = $obj->last_login;
-            $this->last_activity = $obj->last_activity;
-            $this->is_active = (int)$obj->is_active;
-          }
-        }
+      $pdo = DataConnector::get_connection();
+      $stmt = $pdo->prepare("SELECT * FROM accounts WHERE id = :id");
+      $stmt->bindParam(":id",$id,PDO::PARAM_INT);
+      $stmt->execute();
+      while($obj = $stmt->fetch(PDO::FETCH_OBJ)){
+        $this->id = $obj->id;
+        $this->username = $obj->username;
+        $this->email = $obj->email;
+        $this->permission = $obj->permission;
+        $this->roles = json_decode($obj->roles, true);
+        $this->registered = $obj->registered;
+        $this->last_login = $obj->last_login;
+        $this->last_activity = $obj->last_activity;
+        $this->is_active = (int)$obj->is_active;
+      }
     }
 
     public static function check_login($username, $password) {

@@ -1,0 +1,138 @@
+<?php
+
+namespace wridickson\apitest;
+
+Class Auth {
+
+  private $server_name;
+  private $jwt_key;
+  private $db_host;
+  private $db_name;
+  private $db_user;
+  private $db_pass;
+
+  private $id;
+  private $username;
+  private $email;
+  private $permission; 
+  private $roles;
+  private $registered;
+  private $last_login;
+  private $last_activity;
+  private $is_active;
+
+  public function __construct (  $server_name, $jwt_key, $db_host, $db_name, $db_user, $db_pass ) {
+
+    $this->server_name = $server_name;
+    $this->jwt_key = $jwt_key;
+    $this->db_host = $db_host;
+    $this->db_name = $db_name;
+    $this->db_user = $db_user;
+    $this->db_pass = $db_pass;
+
+    $this->data_connector = new DataConnector();
+
+  }
+
+  public function account_to_array_secure () {
+    $arr = array();
+    $arr['id'] = $this->id;
+    $arr['username'] = $this->username;
+    $arr['permission'] = $this->permission;
+    $arr['roles'] = $this->roles;
+    $arr['is_active'] = $this->is_active;
+    return $arr;
+  }
+
+  public function authenticate( $perm_required, $token ){
+    $authenticate_status = null;
+    $authenticate_decoded = null;
+
+    //  handle jwt is null, ie 'jwt' is not set in headers
+    if(!$token){
+      //  status 400: Bad Request
+      $authenticate_status = 400;
+    } else {
+      try{
+        //  const JWT_KEY is defined in config
+        $authenticate_decoded = JWT::decode( $token, new Key( $this->jwt_key, 'HS256') );
+        //  check that the user has the permission level
+        //  OR has the role 
+        if( $authenticate_decoded->account->permission < $perm_required['permission'] &&
+            !in_array($perm_required['role'], $authenticate_decoded->account->roles) ) {
+          //  status 403: Forbidden
+          $authenticate_status = 403;
+        } else {
+          //  test iss, nbf and exp
+          $now = new DateTimeImmutable();
+          if ($authenticate_decoded->iss !== SERVER_NAME ||
+              $authenticate_decoded->nbf > $now->getTimestamp() ||
+              $authenticate_decoded->exp < $now->getTimestamp()) {
+            //  status 401: Unauthorized
+            $authenticate_status = 401;
+          } else {
+            //  jwt has passed authentication
+            $authenticate_status = 200;
+          }
+        }
+      //  JWT::decode() throws errors if the decode fails
+      } catch (SignatureInvalidException $e){
+        //  status 401: Unauthorized
+        $authenticate_status = 401;
+      } catch (BeforeValidException $e) {
+        // provided JWT is trying to be used before "nbf" claim OR
+        // provided JWT is trying to be used before "iat" claim.
+        //  status 401: Unauthorized
+        $authenticate_status = 401;
+      } catch (ExpiredException $e) {
+        // provided JWT is trying to be used after "exp" claim.
+        //  status 401: Unauthorized
+        $authenticate_status = 401;
+      }
+    }
+    $r = array(
+      'status' => $authenticate_status,
+      'decoded' => $authenticate_decoded
+    );
+    return $r;
+  }
+
+  public function generate_token( $account_id ) {
+    $this->load_account( $account_id );
+    $issuedAt = new DateTimeImmutable();
+    $expire = $issuedAt->modify('+1 days')->getTimestamp();
+    $payload = [
+      'iat' => $issuedAt->getTimestamp(),  // Issued at: time when the token was generated,
+      //  SERVER_NAME is a constant set in config.php
+      'iss' => SERVER_NAME,
+      'exp' => $expire,
+      'exp_f' => date("Y-m-d H:m:s", $expire),  // Formatted expire
+      'nbf'  => $issuedAt->getTimestamp(),  // Not before
+      'nbf_f' => date( "Y-m-d H:m:s", $issuedAt->getTimestamp() ),  // Formatted not before
+      'account' => $account->to_array_secure()
+    ];
+    $token = JWT::encode($payload, JWT_KEY, 'HS256');
+    return $token;
+  }
+
+  public function load_account ( $account_id ) {
+    $pdo = $this->data_connector->get_connection( $this->db_host, $this->dc_name, $this->db_user, $this->db_pass );
+    $stmt = $pdo->prepare("SELECT * FROM accounts WHERE id = :id");
+    $stmt->bindParam(":id", $id);
+    $stmt->execute();
+    while($obj = $stmt->fetch(PDO::FETCH_OBJ)){
+      $this->id = $obj->id;
+      $this->username = $obj->username;
+      $this->email = $obj->email;
+      $this->permission = $obj->permission;
+      $this->roles = json_decode($obj->roles, true);
+      $this->registered = $obj->registered;
+      $this->last_login = $obj->last_login;
+      $this->last_activity = $obj->last_activity;
+      $this->is_active = (int)$obj->is_active;
+    }
+  }
+
+
+
+}
