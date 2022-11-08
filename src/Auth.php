@@ -114,11 +114,11 @@ Class Auth {
       if(password_verify($password, $result['password']) == true){
         $response['pass'] = true;
         $response['account_id'] = $result['id'];
-        $account = new Account($result['id']);
+        $account = $this->load_account($result['id']);
         //  update the login
-        $response['update_login'] = $account->update_login();
-        $response['update_activity'] = $account->update_activity();
-        $response['account'] = $account->to_array_secure();
+        //$response['update_login'] = $account->update_login();
+        //$response['update_activity'] = $account->update_activity();
+        $response['account'] = $this->account_to_array_secure();
       } else {
         $response['pass'] = false;
         $response['account_id'] = -1;
