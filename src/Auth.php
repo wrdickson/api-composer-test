@@ -29,6 +29,14 @@ Class Auth {
   private $last_activity;
   private $is_active;
 
+  /**
+   * @param string $server_name should be $_SERVER[SERVER_NAME], used to make and check jwt tokens
+   * @param string $jwt_key secret key for coding and decoding jwt tokens
+   * @param string $db_host host name for mysql pdo connection
+   * @param string $db_name name of the db
+   * @param string $db_user 
+   * @param string $db_pass user password
+   */
   public function __construct (  $server_name, $jwt_key, $db_host, $db_name, $db_user, $db_pass ) {
 
     $this->server_name = $server_name;
