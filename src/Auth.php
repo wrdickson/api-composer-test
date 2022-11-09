@@ -179,6 +179,7 @@ Class Auth {
     }
   }
 
+  //  this should probably be removed in a production environment
   public function set_password($user_id, $password) {
     if($user_id){
       $xid = $user_id;
