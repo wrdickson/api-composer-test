@@ -3,6 +3,7 @@
 namespace wrdickson\apitest;
 
 use \PDO;
+use \PDOException;
 use \DateTimeImmutable;
 use \Firebase\JWT\JWT;
 use \Firebase\JWT\Key;
